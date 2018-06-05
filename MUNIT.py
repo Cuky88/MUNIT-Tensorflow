@@ -5,55 +5,55 @@ import time
 from tensorflow.contrib.data import batch_and_drop_remainder
 
 class MUNIT(object) :
-    def __init__(self, sess, args):
+    def __init__(self, sess, config):
         self.model_name = 'MUNIT'
         self.sess = sess
-        self.checkpoint_dir = args.checkpoint_dir
-        self.result_dir = args.result_dir
-        self.log_dir = args.log_dir
-        self.sample_dir = args.sample_dir
-        self.dataset_name = args.dataset
-        self.augment_flag = args.augment_flag
+        self.checkpoint_dir = config['checkpoint_dir']
+        self.result_dir = config['result_dir']
+        self.log_dir = config['log_dir']
+        self.sample_dir = config['sample_dir']
+        self.dataset_name = config['dataset']
+        self.augment_flag = config['augment_flag']
 
-        self.epoch = args.epoch
-        self.iteration = args.iteration
+        self.epoch = config['epoch']
+        self.iteration = config['iteration']
 
-        self.gan_type = args.gan_type
+        self.gan_type = config['gan_type']
 
-        self.batch_size = args.batch_size
-        self.print_freq = args.print_freq
-        self.save_freq = args.save_freq
-        self.num_style = args.num_style # for test
-        self.guide_img = args.guide_img
-        self.direction = args.direction
+        self.batch_size = config['batch_size']
+        self.print_freq = config['print_freq']
+        self.save_freq = config['save_freq']
+        self.num_style = config['num_style'] # for test
+        self.guide_img = config['guide_img']
+        self.direction = config['direction']
 
-        self.img_h = args.img_h
-        self.img_w = args.img_w
-        self.img_ch = args.img_ch
+        self.img_h = config['img_h']
+        self.img_w = config['img_w']
+        self.img_ch = config['img_ch']
 
-        self.init_lr = args.lr
-        self.ch = args.ch
+        self.init_lr = config['lr']
+        self.ch = config['ch']
 
         """ Weight """
-        self.gan_w = args.gan_w
-        self.recon_x_w = args.recon_x_w
-        self.recon_s_w = args.recon_s_w
-        self.recon_c_w = args.recon_c_w
-        self.recon_x_cyc_w = args.recon_x_cyc_w
+        self.gan_w = config['gan_w']
+        self.recon_x_w = config['recon_x_w']
+        self.recon_s_w = config['recon_s_w']
+        self.recon_c_w = config['recon_c_w']
+        self.recon_x_cyc_w = config['recon_x_cyc_w']
 
         """ Generator """
-        self.n_res = args.n_res
-        self.mlp_dim = pow(2, args.n_sample) * args.ch # default : 256
+        self.n_res = config['n_res']
+        self.mlp_dim = pow(2, config['n_sample']) * config['ch'] # default : 256
 
-        self.n_downsample = args.n_sample
-        self.n_upsample = args.n_sample
-        self.style_dim = args.style_dim
+        self.n_downsample = config['n_sample']
+        self.n_upsample = config['n_sample']
+        self.style_dim = config['style_dim']
 
         """ Discriminator """
-        self.n_dis = args.n_dis
-        self.n_scale = args.n_scale
+        self.n_dis = config['n_dis']
+        self.n_scale = config['n_scale']
 
-        self.sample_dir = os.path.join(args.sample_dir, self.model_dir)
+        self.sample_dir = os.path.join(config['sample_dir'], self.model_dir)
         check_folder(self.sample_dir)
 
         self.trainA_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainA'))
