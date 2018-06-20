@@ -50,7 +50,7 @@ img_ch: 3                     # The size of image channel
 num_workers: 8                # number of data loading threads
 
 # logging options
-prefix: perl               # Prefix for all directory names
+prefix: 2perl                 # Prefix for all directory names
 checkpoint_dir: checkpoint    # Directory name to save the checkpoints
 result_dir: results           # Directory name to save the generated images
 log_dir: logs                 # Directory name to save training logs
