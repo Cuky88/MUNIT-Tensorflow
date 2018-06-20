@@ -8,11 +8,13 @@ class MUNIT(object) :
     def __init__(self, sess, config):
         self.model_name = 'MUNIT'
         self.sess = sess
+        self.phase = config["phase"]
         self.checkpoint_dir = config['checkpoint_dir']
         self.result_dir = config['result_dir']
         self.log_dir = config['log_dir']
         self.sample_dir = config['sample_dir']
         self.dataset_name = config['dataset']
+        self.prefix = config[ 'prefix' ]
         self.augment_flag = config['augment_flag']
 
         self.epoch = config['epoch']
@@ -23,6 +25,7 @@ class MUNIT(object) :
         self.batch_size = config['batch_size']
         self.print_freq = config['print_freq']
         self.save_freq = config['save_freq']
+        self.img_freq = config['img_freq']
         self.num_style = config['num_style'] # for test
         self.guide_img = config['guide_img']
         self.direction = config['direction']
@@ -30,6 +33,7 @@ class MUNIT(object) :
         self.img_h = config['img_h']
         self.img_w = config['img_w']
         self.img_ch = config['img_ch']
+        self.num_workers = config["num_workers"]
 
         self.init_lr = config['lr']
         self.ch = config['ch']
@@ -46,15 +50,17 @@ class MUNIT(object) :
 
         """ Generator """
         self.n_res = config['n_res']
-        self.mlp_dim = pow(2, config['n_sample']) * config['ch'] # default : 256
+        self.mlp_dim = config['mlp_dim']
 
         self.n_downsample = config['n_sample']
         self.n_upsample = config['n_sample']
         self.style_dim = config['style_dim']
 
+
         """ Discriminator """
         self.n_dis = config['n_dis']
         self.n_scale = config['n_scale']
+
 
         self.sample_dir = os.path.join(config['sample_dir'], self.model_dir)
         check_folder(self.sample_dir)
