@@ -1,14 +1,17 @@
-# python main.py --phase train --dataset sun2rain --batch_size 1
+# python main.py --config configs/sun2rain.yaml
 
 from MUNIT import MUNIT
 import argparse
 from utils import *
+import os
+
+# TODO: Implement Visualizers like in https://github.com/azadis/MC-GAN
 
 """parsing and configuration"""
 def parse_args():
     desc = "Tensorflow implementation of MUNIT"
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument('--config', type=str, default='configs/edges2handbags_folder', help='Path to the config file.')
+    parser.add_argument('--config', type=str, default='configs/sun2rain.yaml', help='Path to the config file.')
     opts = parser.parse_args()
 
     config = get_config(opts.config)
@@ -49,15 +52,19 @@ def main():
     if conf is None:
       exit()
 
+    os.environ[ "CUDA_VISIBLE_DEVICES" ] = str(conf['GPU'])
+    
     # open session
-    with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
+    config = tf.ConfigProto( allow_soft_placement = False, log_device_placement = True )
+    config.gpu_options.allow_growth = True
+    with tf.Session(config=config) as sess:
         gan = MUNIT(sess, conf)
 
         # build graph
         gan.build_model()
 
         # show network architecture
-        show_all_variables()
+        #show_all_variables()
 
         if conf['phase'] == 'train' :
             # launch the graph in a session
