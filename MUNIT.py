@@ -113,7 +113,7 @@ class MUNIT(object) :
 
                 channel = channel * 2
 
-            for i in range(2) :
+            for i in range(self.n_downsample - 2) :
                 x = conv(x, channel, kernel=4, stride=2, pad=1, pad_type='reflect', scope='down_conv_'+str(i))
                 x = relu(x)
 
