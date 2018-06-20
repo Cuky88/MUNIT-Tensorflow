@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+vgg16/
+checkpoints/
+logs/
+samples/
+results/
+
 # C extensions
 *.so
 
