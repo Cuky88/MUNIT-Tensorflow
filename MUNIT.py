@@ -40,6 +40,9 @@ class MUNIT(object) :
         self.recon_s_w = config['recon_s_w']
         self.recon_c_w = config['recon_c_w']
         self.recon_x_cyc_w = config['recon_x_cyc_w']
+        self.vgg_w = config['vgg_w']
+        self.vgg_layer_names = config["vgg_layer_names"].split(",")
+        self.vgg_weight = config['vgg_weight_file']
 
         """ Generator """
         self.n_res = config['n_res']
@@ -63,11 +66,14 @@ class MUNIT(object) :
         print("##### Information #####")
         print("# gan type : ", self.gan_type)
         print("# dataset : ", self.dataset_name)
+        print("# model directory : ", self.model_dir)
         print("# max dataset number : ", self.dataset_num)
         print("# batch_size : ", self.batch_size)
         print("# epoch : ", self.epoch)
         print("# iteration per epoch : ", self.iteration)
         print("# style in test phase : ", self.num_style)
+        print("# VGG16 layer names : ", self.vgg_layer_names)
+        print("# VGG16 weight file : ", self.vgg_weight)
 
         print()
 
@@ -306,18 +312,25 @@ class MUNIT(object) :
         recon_content_A = L1_loss(content_a_, content_a)
         recon_content_B = L1_loss(content_b_, content_b)
 
+        """Load perceptual loss (VGG16) network"""
+        if self.vgg_w > 0:
+            G_vgg_loss_a, G_vgg_loss_b = compute_vgg_loss( [x_ba, self.domain_B, x_ab, self.domain_A], self.vgg_layer_names, self.batch_size, self.img_ch, self.vgg_weight )
+        else:
+            G_vgg_loss_a = G_vgg_loss_b = 0.0
 
         Generator_A_loss = self.gan_w * G_ad_loss_a + \
                            self.recon_x_w * recon_A + \
                            self.recon_s_w * recon_style_A + \
                            self.recon_c_w * recon_content_A + \
-                           self.recon_x_cyc_w * cyc_recon_A
+                           self.recon_x_cyc_w * cyc_recon_A + \
+                           self.vgg_w * G_vgg_loss_a
 
         Generator_B_loss = self.gan_w * G_ad_loss_b + \
                            self.recon_x_w * recon_B + \
                            self.recon_s_w * recon_style_B + \
                            self.recon_c_w * recon_content_B + \
-                           self.recon_x_cyc_w * cyc_recon_B
+                           self.recon_x_cyc_w * cyc_recon_B + \
+                           self.vgg_w * G_vgg_loss_b
 
         Discriminator_A_loss = self.gan_w * D_ad_loss_a
         Discriminator_B_loss = self.gan_w * D_ad_loss_b
@@ -341,9 +354,16 @@ class MUNIT(object) :
         self.G_B_loss = tf.summary.scalar("G_B_loss", Generator_B_loss)
         self.D_A_loss = tf.summary.scalar("D_A_loss", Discriminator_A_loss)
         self.D_B_loss = tf.summary.scalar("D_B_loss", Discriminator_B_loss)
-
-        self.G_loss = tf.summary.merge([self.G_A_loss, self.G_B_loss, self.all_G_loss])
-        self.D_loss = tf.summary.merge([self.D_A_loss, self.D_B_loss, self.all_D_loss])
+        
+        if self.vgg_w > 0:
+            self.G_A_vgg_loss = tf.summary.scalar( "G_A_vgg_loss", G_vgg_loss_a )
+            self.G_B_vgg_loss = tf.summary.scalar( "G_B_vgg_loss", G_vgg_loss_b )
+    
+            self.G_loss = tf.summary.merge([self.G_A_loss, self.G_B_loss, self.all_G_loss, self.G_A_vgg_loss, self.G_B_vgg_loss])
+            self.D_loss = tf.summary.merge([self.D_A_loss, self.D_B_loss, self.all_D_loss])
+        else:
+            self.G_loss = tf.summary.merge( [ self.G_A_loss, self.G_B_loss, self.all_G_loss ] )
+            self.D_loss = tf.summary.merge( [ self.D_A_loss, self.D_B_loss, self.all_D_loss ] )
 
         """ Image """
         self.fake_A = x_ba
