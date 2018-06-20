@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 vgg16/
-checkpoints/
+checkpoint/
 logs/
 samples/
 results/
