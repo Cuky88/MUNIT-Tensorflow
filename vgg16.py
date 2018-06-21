@@ -152,7 +152,7 @@ class Vgg16:
             
             return data
         
-        data = self.data_dict[ name ][ 0 ]
+        data = self.data_dict[ name ][ column ]
         return data
 
     def get_conv_filter(self, name):
